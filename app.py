@@ -2,7 +2,6 @@ from flask import request, jsonify, Flask
 import markdown
 import codecs
 import grokapi
-import logging
 import base64
 
 app = Flask(__name__)
