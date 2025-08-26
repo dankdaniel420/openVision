@@ -3,3 +3,4 @@ Markdown
 groq
 python-dotenv
 gunicorn
+logging
