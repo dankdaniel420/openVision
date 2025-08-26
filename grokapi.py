@@ -25,9 +25,13 @@ def query_image(base64_contentbytes: str, query: str):
             }
         ],
         model="meta-llama/llama-4-scout-17b-16e-instruct",
+        temperature=0.1,
+        stream=False,
+        response_format={"type": "json_object"},
+        stop=None,
     )
 
-    print(chat_completion.choices[0].message.content)
+    return chat_completion.choices[0].message.content
 
 if __name__ == "__main__":
     load_dotenv()
@@ -41,4 +45,5 @@ if __name__ == "__main__":
 
     # Getting the base64 string
     base64_image = encode_image(image_path)
-    query_image(base64_image, "Is this image a valid IC?")
+    print(base64_image)
+    print(query_image(base64_image, "Give the answer to the following questions in JSON format. valid? name? ic?"))

@@ -1,6 +1,9 @@
-from flask import Flask
+from flask import request, jsonify, Flask
 import markdown
 import codecs
+import grokapi
+import logging
+import base64
 
 app = Flask(__name__)
 
@@ -30,6 +33,24 @@ def index():
     </div>
     """
     return styled_html
+
+@app.route("/query", methods=["POST"])
+def query():
+    if 'image' not in request.files:
+        return jsonify({"error": "No image file provided"}), 400
+
+    image_file = request.files['image']
+    query_text = request.form.get('query')
+
+    if not query_text:
+        return jsonify({"error": "No query text provided"}), 400
+
+    # Read the image file's bytes and encode to base64
+    image_bytes = image_file.read()
+    base64_image = base64.b64encode(image_bytes).decode('utf-8')
+
+    response = grokapi.query_image(base64_image, query_text)
+    return jsonify(response)
 
 if __name__ == "__main__":
     app.run(debug=True)
