@@ -42,6 +42,23 @@ def query():
     response = grokapi.query_image(base64_image, query_text)
     return jsonify(response)
 
+@app.route("/duuck/moderate_idea", methods=["POST"])
+def moderate_idea():
+    data = request.get_json()
+    video_idea = data.get("video_idea")
+    logging.info(f"Received video idea: {video_idea}")
+    response = grokapi.query_text(video_idea)
+    return jsonify(response)
+
+@app.route("/duuck/similar_idea", methods=["POST"])
+def similar_idea():
+    data = request.get_json()
+    video_idea = data.get("video_idea")
+    database_ideas = data.get("database_ideas")
+    logging.info(f"Received video idea: {video_idea}")
+    response = grokapi.find_similar(video_idea, database_ideas)
+    return jsonify(response)
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     app.run()
