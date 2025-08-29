@@ -80,7 +80,7 @@ Analyze the following video idea and provide a JSON output containing:
 - A 'similar' field that lists the top 3 most similar ideas from the provided database of existing ideas.  
     - Do not invent new ideas.  
     - Only select from the provided list.  
-    - Always return exactly 3 items unless the database has fewer.  
+    - Return up to 3 items, but fewer if fewer strong matches exist. 
     - If no ideas are similar, return an empty list.  
 
 Video Idea:
