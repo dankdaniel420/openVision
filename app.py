@@ -1,8 +1,12 @@
 from flask import request, jsonify, Flask
+from waitress import serve
 import markdown
 import codecs
 import grokapi
 import logging
+import secrets
+
+storage = {}
 
 app = Flask(__name__)
 
@@ -42,23 +46,23 @@ def query():
     response = grokapi.query_image(base64_image, query_text)
     return jsonify(response)
 
-@app.route("/duuck/moderate_idea", methods=["POST"])
-def moderate_idea():
-    data = request.get_json()
-    video_idea = data.get("video_idea")
-    logging.info(f"Received video idea: {video_idea}")
-    response = grokapi.query_text(video_idea)
-    return jsonify(response)
+# Endpoint to store content bytes (base64) and return a secret key
+@app.route("/content", methods=["POST"])
+def store_content():
+    req = request.get_json()
+    content_bytes = req.get("contentBytes")
+    secret_key = secrets.token_urlsafe(32)
+    storage[secret_key] = content_bytes
+    return jsonify({"key": secret_key})
 
-@app.route("/duuck/similar_idea", methods=["POST"])
-def similar_idea():
-    data = request.get_json()
-    video_idea = data.get("video_idea")
-    database_ideas = data.get("database_ideas")
-    logging.info(f"Received video idea: {video_idea}")
-    response = grokapi.find_similar(video_idea, database_ideas)
-    return jsonify(response)
+# Endpoint to retrieve content bytes using the secret key in the request body
+@app.route("/content", methods=["GET"])
+def retrieve_content():
+    req = request.get_json()
+    key = req.get("key")
+    content_bytes = storage.get(key)
+    return jsonify({"contentBytes": content_bytes})
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    app.run()
+    serve(app, host="0.0.0.0", port=5000)
