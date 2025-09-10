@@ -44,12 +44,13 @@ def query():
     response = grokapi.query_image(base64_image, query_text)
     return jsonify(response)
 
-# Endpoint to store content bytes (base64) and return a secret key
+# zip csv content and return base64 zip
 @app.route("/content", methods=["POST"])
 def store_content():
     req = request.get_json()
+    file_name = req.get("fileName", "IFRS_Validation_Report.xlsx")
     content_string = req.get("contentString")
-    zip = excel_zip.compress(content_string)
+    zip = excel_zip.compress(file_name, content_string)
     return jsonify({"base64_zip": zip})
 
 if __name__ == "__main__":
