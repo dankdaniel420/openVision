@@ -7,20 +7,27 @@ import logging
 
 
 def compress(raw_data: str) -> str:
-    with open("/tmp/big.csv", "w", encoding="utf-8") as f:
-        f.write(raw_data)
-
     wb = openpyxl.Workbook(write_only=True)  # write-only mode saves memory
     ws = wb.create_sheet("Validation_Errors")
 
-    with open("/tmp/big.csv", "r", encoding="utf-8", newline="") as f:
-        reader = csv.reader(f, quotechar='"')
-        temp = 0
-        for row in reader:
-            ws.append(row)
-            if temp < 5:
-                print(row)
-                temp += 1
+    for line in raw_data.splitlines():
+        # Skip empty lines
+        if not line.strip():
+            continue
+        # Split by comma (basic CSV parsing; handle quotes manually if needed)
+        row = []
+        current = ""
+        in_quotes = False
+        for char in line:
+            if char == "'":
+                in_quotes = not in_quotes
+            elif char == "," and not in_quotes:
+                row.append(current)
+                current = ""
+            else:
+                current += char
+        row.append(current)
+        ws.append(row)
 
     excel_buffer = io.BytesIO()
     wb.save(excel_buffer)
