@@ -3,10 +3,8 @@ from waitress import serve
 import markdown
 import codecs
 import grokapi
+import excel_zip
 import logging
-import secrets
-
-storage = {}
 
 app = Flask(__name__)
 
@@ -50,18 +48,9 @@ def query():
 @app.route("/content", methods=["POST"])
 def store_content():
     req = request.get_json()
-    content_bytes = req.get("contentBytes")
-    secret_key = secrets.token_urlsafe(32)
-    storage[secret_key] = content_bytes
-    return jsonify({"key": secret_key})
-
-# Endpoint to retrieve content bytes using the secret key in the request body
-@app.route("/content", methods=["GET"])
-def retrieve_content():
-    req = request.get_json()
-    key = req.get("key")
-    content_bytes = storage.get(key)
-    return jsonify({"contentBytes": content_bytes})
+    content_string = req.get("contentString")
+    zip = excel_zip.compress(content_string)
+    return jsonify({"base64_zip": zip})
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

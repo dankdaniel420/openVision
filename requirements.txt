@@ -3,5 +3,5 @@ Markdown
 groq
 python-dotenv
 gunicorn
-logging
 waitress
+openpyxl
