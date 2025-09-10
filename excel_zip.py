@@ -25,9 +25,9 @@ def compress(raw_data: str) -> str:
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
         zf.writestr("validation_errors.xlsx", excel_buffer.getvalue())
-    zip_buffer.seek(0)
+    zip_bytes = zip_buffer.getvalue()
 
-    return base64.b64encode(zip_buffer.getvalue()).decode("utf-8")
+    return base64.b64encode(zip_bytes).decode("utf-8")
 
 if __name__ == "__main__":
     print(download_errors())
