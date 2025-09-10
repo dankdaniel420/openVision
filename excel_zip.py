@@ -5,14 +5,12 @@ import csv
 import base64
 
 def compress(raw_data: str) -> str:
-    clean_data = raw_data.replace("\\r\\n", "\n").replace('\\"', '"')
-        
     # Step 1: Build Excel workbook in memory
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Validation_Errors"
 
-    reader = csv.reader(io.StringIO(clean_data), quotechar='"')
+    reader = csv.reader(io.StringIO(raw_data), quotechar='"', )
     for row in reader:
         ws.append(row)
 
@@ -30,4 +28,7 @@ def compress(raw_data: str) -> str:
     return base64.b64encode(zip_bytes).decode("utf-8")
 
 if __name__ == "__main__":
-    print(download_errors())
+
+    with open("big.txt", "r", encoding="utf-8") as f:
+        raw_data = f.read()
+        print(compress(raw_data))
