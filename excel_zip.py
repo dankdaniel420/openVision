@@ -6,22 +6,21 @@ import base64
 import logging
 
 
-
 def compress(raw_data: str) -> str:
+    with open("/tmp/big.csv", "w", encoding="utf-8") as f:
+        f.write(raw_data)
+
     wb = openpyxl.Workbook(write_only=True)  # write-only mode saves memory
     ws = wb.create_sheet("Validation_Errors")
 
-    reader = csv.reader(io.StringIO(raw_data), quotechar='"')
-    for row in reader:
-        ws.append(row)
-
-    reader = csv.reader(io.StringIO(raw_data), quotechar='"')
-    temp = 0
-    for row in reader:
-        ws.append(row)
-        if temp < 5:
-            print(row)
-            temp += 1
+    with open("/tmp/big.csv", "r", encoding="utf-8", newline="") as f:
+        reader = csv.reader(f, quotechar='"')
+        temp = 0
+        for row in reader:
+            ws.append(row)
+            if temp < 5:
+                print(row)
+                temp += 1
 
     excel_buffer = io.BytesIO()
     wb.save(excel_buffer)
