@@ -3,21 +3,25 @@ import zipfile
 import openpyxl
 import csv
 import base64
+import logging
 
-def sanitize_cell(value):
-    if value is None:
-        return ""
-    value = str(value)
-    return "".join(c for c in value if c in "\t\n\r" or ord(c) >= 32)
+
 
 def compress(raw_data: str) -> str:
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = "Validation_Errors"
+    wb = openpyxl.Workbook(write_only=True)  # write-only mode saves memory
+    ws = wb.create_sheet("Validation_Errors")
 
     reader = csv.reader(io.StringIO(raw_data), quotechar='"')
     for row in reader:
-        ws.append([sanitize_cell(c) for c in row])
+        ws.append(row)
+
+    reader = csv.reader(io.StringIO(raw_data), quotechar='"')
+    temp = 0
+    for row in reader:
+        ws.append(row)
+        if temp < 5:
+            print(row)
+            temp += 1
 
     excel_buffer = io.BytesIO()
     wb.save(excel_buffer)
